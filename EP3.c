@@ -22,6 +22,8 @@ void imprimeMatriz(double A[][MAXM], int n, int m);
 
 void imprimeVetor(double v[], int n);
 
+void imprimeColuna(double A[][MAXM], int j, int start, int end);
+
 double leArquivo(char nomearq[]);
 
 void reescalaMatriz(double max);
@@ -80,7 +82,7 @@ int main(int argc, char* argv[]) {
     calculaNormas(normas);
 
     /* Decomposição QR */
-    
+
     for (k = 0; k < m; k++) {
 
         if (verbose) printf("----- Q%d -----\n", k);
@@ -109,11 +111,21 @@ void imprimeMatriz(double M[][MAXM], int l, int c) {
 
 void imprimeVetor(double v[], int l) {
 
-	int i, j;
+	int i;
 
 	for (i = 0; i < l; i++)
 		printf("%lf ", v[i]);
 	printf("\n\n");
+}
+
+void imprimeColuna(double A[][MAXM], int j, int start, int end) {
+
+    int i;
+
+    for (i = start; i < end; i++)
+        printf("%lf ", A[i][j]);
+    printf("\n\n");
+
 }
 
 
@@ -221,7 +233,6 @@ void recalculaNormas(double normas[], int k) {
    dado em seu lugar.                                                                                         */
 void decomposicaoQR(int k, double normas[]) {
 
-<<<<<<< HEAD
     int j;
     double tau, gama;
 
@@ -232,16 +243,10 @@ void decomposicaoQR(int k, double normas[]) {
     if (tau > EPS)
         gama = A[j][j] / tau;
     else gama = 0;
-=======
-	double tau, gama;
 
-	tau = normas[j];
-	if (A[k][k] < 0) tau *= -1;
->>>>>>> da9474ceb99c63efdbd7e3c68cabac16e15a6a87
+    for (k = j + 1; k < n; k++)
+        A[k][j] /= A[j][j];
 
-}
-
-<<<<<<< HEAD
     A[j][j] = -tau;
     if (verbose && gama != 0) {
         printf("Tau: %lf\n", tau);
@@ -254,8 +259,9 @@ void decomposicaoQR(int k, double normas[]) {
 /* Essa função multiplica o vetor b por um Qt = I - gama * uT * u */
 void multiplicaB() {
 
-    double v[MAXN]
-=======
+    double v[MAXN];
+}
+
 void back_subst(double x[], int k) {
 
     int i, j;      
@@ -267,7 +273,6 @@ void back_subst(double x[], int k) {
         printf("%lf \n", x[i]);
         x[i] = x[i] / A[i][i];  
     }
->>>>>>> da9474ceb99c63efdbd7e3c68cabac16e15a6a87
 
     imprimeVetor(x, n);
 }
