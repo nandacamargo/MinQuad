@@ -32,9 +32,9 @@ void calculaNormas(double normas[]);
 
 void recalculaNormas(double normas[], int k);
 
-void decomposicaoQR(int k, double normas[]);
+double decomposicaoQR(int k, double normas[]);
 
-void multiplicaB();
+void multiplicaB(int k, double gama);
 
 void back_subst(double x[MAXN], int k);
 
@@ -43,7 +43,7 @@ void back_subst(double x[MAXN], int k);
 int main(int argc, char* argv[]) {
 
 	int i, k;
-	double max;
+	double max, gama;
 	double normas[MAXM];
 
 	/* Lidando com os argumentos */
@@ -87,8 +87,8 @@ int main(int argc, char* argv[]) {
 
         if (verbose) printf("----- Q%d -----\n", k);
         recalculaNormas(normas, k);
-        decomposicaoQR(k, normas);
-        multiplicaB();
+        gama = decomposicaoQR(k, normas);
+        multiplicaB(k, gama);
         if (verbose) printf("--------------\n");
      }
 
@@ -196,6 +196,9 @@ void reescalaMatriz(double max) {
 	if (verbose) {
 		printf("Matriz reescalada: \n");
 		imprimeMatriz(A, n, m);
+
+        printf("b reescalado: \n");
+        imprimeVetor(b, n);
 	}
 }
 
@@ -231,7 +234,7 @@ void recalculaNormas(double normas[], int k) {
 /* Essa função calcula tau, gama e o vetor u (será guardado em A) tal que Q = I - gama * u * uT é um refletor 
    que zera tudo abaixo do primeiro elemento da coluna. Como o primeiro elemento de u é sempre 1, -tau é guar-
    dado em seu lugar.                                                                                         */
-void decomposicaoQR(int k, double normas[]) {
+double decomposicaoQR(int k, double normas[]) {
 
     int j;
     double tau, gama;
@@ -255,11 +258,26 @@ void decomposicaoQR(int k, double normas[]) {
         printf("1 ");
         imprimeColuna(A, j, j + 1, n);
     }
+
+    return gama;
 }
 /* Essa função multiplica o vetor b por um Qt = I - gama * uT * u */
-void multiplicaB() {
+void multiplicaB(int k, double gama) {
 
-    double v[MAXN];
+    int i, j;
+    double normaU = 1;
+
+    for (i = k + 1; i < n; i++)
+        normaU += A[i][k] * A[i][k];
+
+    normaU = sqrt(normaU);
+
+    for (i = k; i < n; i++)
+        b[i] -= b[i] * normaU * gama; /* A[i][k] é u[i] */
+
+    if (verbose)
+        imprimeVetor(b, n);
+
 }
 
 void back_subst(double x[], int k) {
