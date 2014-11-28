@@ -30,6 +30,8 @@ void reescalaMatriz(double max);
 
 void calculaNormas(double normas[]);
 
+int maiorNorma(double normas[]);
+
 void recalculaNormas(double normas[], int k);
 
 double decomposicaoQR(int k, double normas[]);
@@ -42,7 +44,7 @@ void back_subst(double x[MAXN], int k);
 
 int main(int argc, char* argv[]) {
 
-	int i, k;
+	int i, k, c;
 	double max, gama;
 	double normas[MAXM];
 
@@ -87,6 +89,8 @@ int main(int argc, char* argv[]) {
 
         if (verbose) printf("----- Q%d -----\n", k);
         recalculaNormas(normas, k);
+        // c = maiorNorma(normas, k);
+        // permutacao(c, k);
         gama = decomposicaoQR(k, normas);
         multiplicaB(k, gama);
         if (verbose) printf("--------------\n");
@@ -217,6 +221,20 @@ void calculaNormas(double normas[]) {
 	}
 }
 
+int maiorNorma(double normas[], int k) {
+
+    int j, c = -1;
+    double max = -1;
+
+    for (j = k; j < m; j++)
+        if (normas[j] > max)
+            c = j;
+
+    return c;
+
+
+}
+
 void recalculaNormas(double normas[], int k) {
 
 	int j;
@@ -264,19 +282,23 @@ double decomposicaoQR(int k, double normas[]) {
 /* Essa função multiplica o vetor b por um Qt = I - gama * uT * u */
 void multiplicaB(int k, double gama) {
 
-    int i, j;
-    double normaU = 1;
+    int i;
+    double v;
+
+    /* gama * uT * b */
+    v = gama * b[k];
 
     for (i = k + 1; i < n; i++)
-        normaU += A[i][k] * A[i][k];
+        v += gama * A[i][k] * b[i]; /* A[i][k] é u[i] */
 
-    normaU = sqrt(normaU);
+    b[k] -= v; 
+    for (i = k + 1; i < n; i++)
+        b[i] -= A[i][k] * v;
 
-    for (i = k; i < n; i++)
-        b[i] -= b[i] * normaU * gama; /* A[i][k] é u[i] */
-
-    if (verbose)
+    if (verbose) {
+        printf("Q^t * b: \n");
         imprimeVetor(b, n);
+    }
 
 }
 
