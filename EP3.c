@@ -143,8 +143,8 @@ double leArquivo(char nomearq[]) {
         return -1;
     }
 
-    fscanf(arq, "%d", &n);
-    fscanf(arq, "%d", &m);
+    fscanf(arq, "%d ", &n);
+    fscanf(arq, "%d ", &m);
     
     for (i = 0; i < n * m; i++) {
         fscanf(arq, "%d", &l);
@@ -154,7 +154,6 @@ double leArquivo(char nomearq[]) {
         if (fabs(valor) > max) max = fabs(valor);
     }
 
-    fscanf(arq, "%d", &n);
     for (i = 0; i < n; i++) {
         fscanf(arq, "%d", &l);
         fscanf(arq, "%lf", &valor);
