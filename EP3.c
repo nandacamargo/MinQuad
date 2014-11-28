@@ -32,7 +32,9 @@ void calculaNormas(double normas[]);
 
 void recalculaNormas(double normas[], int k);
 
-void decomposicaoQR(int j, int k, double normas[]);
+void decomposicaoQR(int k, double normas[]);
+
+void multiplicaB();
 
 /* ------------ Main -------------- */
 
@@ -78,11 +80,14 @@ int main(int argc, char* argv[]) {
     calculaNormas(normas);
 
     /* Decomposição QR */
-    // for (k = 0; k <= m; k++) {
-    //     recalculaNormas(normas, k);
-    //     decomposicaoQR(0, 0, normas);
-    // }
-    decomposicaoQR(0, 0, normas);
+    for (k = 0; k < m; k++) {
+
+        if (verbose) printf("----- Q%d -----\n", k);
+        recalculaNormas(normas, k);
+        decomposicaoQR(k, normas);
+        multiplicaB();
+        if (verbose) printf("--------------\n");
+     }
 
     return 0;
 }
@@ -220,15 +225,18 @@ void recalculaNormas(double normas[], int k) {
 }
 
 /* Essa função calcula tau, gama e o vetor u (será guardado em A) tal que Q = I - gama * u * uT é um refletor 
-   que zera tudo abaixo do primeiro elemento da coluna  */
-void decomposicaoQR(int j, int k, double normas[]) {
+   que zera tudo abaixo do primeiro elemento da coluna. Como o primeiro elemento de u é sempre 1, -tau é guar-
+   dado em seu lugar.                                                                                         */
+void decomposicaoQR(int k, double normas[]) {
 
+    int j;
     double tau, gama;
 
+    j = k;
     tau = sqrt(normas[j]);
     if (A[j][j] < 0) tau *= -1;
     A[j][j] += tau;
-    if (tau != 0)
+    if (tau > EPS)
         gama = A[j][j] / tau;
     else gama = 0;
 
@@ -236,13 +244,17 @@ void decomposicaoQR(int j, int k, double normas[]) {
         A[k][j] /= A[j][j];
 
     A[j][j] = -tau;
-    if (verbose) {
+    if (verbose && gama != 0) {
         printf("Tau: %lf\n", tau);
         printf("Gama: %lf\n", gama);
         printf("u: \n");
         printf("1 ");
         imprimeColuna(A, j, j + 1, n);
     }
+}
+/* Essa função multiplica o vetor b por um Qt = I - gama * uT * u */
+void multiplicaB() {
 
+    double v[MAXN]
 
 }
