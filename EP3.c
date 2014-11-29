@@ -30,9 +30,11 @@ void reescalaMatriz(double max);
 
 void calculaNormas(double normas[]);
 
-int maiorNorma(double normas[]);
+int maiorNorma(double normas[], int k);
 
 void recalculaNormas(double normas[], int k);
+
+void permutacao(int j, int k, double normas[]);
 
 double decomposicaoQR(int k, double normas[]);
 
@@ -45,6 +47,7 @@ void back_subst(double x[MAXN], int k);
 int main(int argc, char* argv[]) {
 
 	int i, k, c;
+    int p[MAXM];
 	double max, gama;
 	double normas[MAXM];
 
@@ -89,10 +92,16 @@ int main(int argc, char* argv[]) {
 
         if (verbose) printf("----- Q%d -----\n", k);
         recalculaNormas(normas, k);
-        // c = maiorNorma(normas, k);
-        // permutacao(c, k);
+        c = maiorNorma(normas, k);
+        p[k] = c;
+
+        if (c != k)
+            permutacao(c, k, normas);
+
         gama = decomposicaoQR(k, normas);
+
         multiplicaB(k, gama);
+
         if (verbose) printf("--------------\n");
      }
 
@@ -226,8 +235,13 @@ int maiorNorma(double normas[], int k) {
     double max = -1;
 
     for (j = k; j < m; j++)
-        if (normas[j] > max)
+        if (normas[j] > max){
             c = j;
+            max = normas[j];
+        }
+
+    if (verbose)
+        printf("Maior norma: %lf (normas[%d])\n", max, c);
 
     return c;
 
@@ -246,6 +260,32 @@ void recalculaNormas(double normas[], int k) {
 			imprimeVetor(normas, m);
 		}
 	}
+}
+
+void permutacao(int j, int k, double normas[]) {
+
+    double aux, auxNorma;
+    int i;
+
+    if (verbose) {
+        printf("Trocando as colunas %d e %d...\nAntes:\n", j, k);
+        imprimeMatriz(A, n, m);
+    }
+
+    for (i = 0; i < n; i++) {
+        aux = A[i][j];
+        A[i][j] = A[i][k];
+        A[i][k] = aux;
+    }
+
+    auxNorma = normas[j];
+    normas[j] = normas[k];
+    normas[k] = auxNorma;
+
+    if (verbose) {
+        printf("Depois:\n");
+        imprimeMatriz(A, n, m);
+    }
 }
 
 /* Essa função calcula tau, gama e o vetor u (será guardado em A) tal que Q = I - gama * u * uT é um refletor 
