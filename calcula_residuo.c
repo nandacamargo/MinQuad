@@ -25,10 +25,11 @@ double calcula_Residuo(double x_aprox[MAXM]) {
 	double residuo, temp[MAXN];
 	residuo = 0;
 
-	for (i = 0; i < n; i++)
+	for (i = 0; i < n; i++) {
 		temp[i] = 0;
 		for (j = 0; j < m; j++)
 			temp[i] += A[i][j] * x_aprox[j]; 
+	}
 
 	for (i = 0; i < n; i++)
 		temp[i] = b[i] - temp[i];
@@ -93,7 +94,7 @@ void le_X(char nomearq[], double x_aprox[]) {
     for (i = 0; i < m; i++) {
         fscanf(arq, "%d", &l);
         fscanf(arq, "%lf", &valor);
-        b[l] = valor;
+        x_aprox[l] = valor;
     }
 
     fclose(arq);
