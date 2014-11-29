@@ -398,7 +398,7 @@ void multiplicaQt(int k, double gama) {
         printf("Q^t * b: \n");
         imprimeVetor(b, n);
 
-        printf("R: \n");
+        printf("A modificado (R + vetores u): \n");
         imprimeMatriz(A, n, m);
     }
 
