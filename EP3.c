@@ -353,13 +353,6 @@ void multiplicaQt(int k, double gama) {
         temp[i] = 0;
     }
 
-    printf("k = %d\n", k);
-    printf("vT: \n");
-    imprimeVetor(vT + k, n - k);
-
-    printf("A: \n");
-    imprimeMatriz(A, n, m);
-
     /* temp = vT * A */
 
     /* primeira linha de A (pois não precisamos mexer em A[k][k]) */
@@ -372,10 +365,7 @@ void multiplicaQt(int k, double gama) {
 
     for (i = k + 1; i < n ; i++) 
         for (j = i; j < m; j++)
-            temp[j] += vT[i] * A[i][j];
-
-    printf("temp: \n");
-    imprimeVetor(temp + k, n - k);   
+            temp[j] += vT[i] * A[i][j];  
 
     /* A = A - u * temp */
     /* Primeira linha de A (pois não precisamos mexer em A[k][k])) */
