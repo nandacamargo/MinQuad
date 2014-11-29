@@ -46,10 +46,10 @@ void back_subst(double x[MAXN], int k);
 
 int main(int argc, char* argv[]) {
 
-	int i, k, c;
+	int i, j, k, c;
     int p[MAXM];
-	double max, gama;
-	double normas[MAXM];
+	double max, gama, aux;
+	double normas[MAXM], x[MAXM];
 
 	/* Lidando com os argumentos */
 
@@ -98,8 +98,7 @@ int main(int argc, char* argv[]) {
         if (normas[c] <= EPS)
             break;
 
-        if (c != k)
-            permutacao(c, k, normas);
+        permutacao(c, k, normas);
 
         gama = decomposicaoQR(k, normas);
 
@@ -110,6 +109,20 @@ int main(int argc, char* argv[]) {
 
     printf("Fim do QR. Posto(A) = %d\n", k);
 
+    /* Cálculo de x */
+
+    back_subst(x, k);
+
+    /* Permuta x */
+    for (j = k - 1; j >= 0; j--)
+        if (j != p[j]) {
+            printf("Trocando as colunas %d e %d de x...\n", j, p[j]);
+            aux = x[j];
+            x[j] = x[p[j]];
+            x[p[j]] = aux;           
+        }
+    printf("x: \n");
+    imprimeVetor(x, k);
 
     return 0;
 }
@@ -273,24 +286,26 @@ void permutacao(int j, int k, double normas[]) {
     double aux, auxNorma;
     int i;
 
-    if (verbose) {
-        printf("Trocando as colunas %d e %d...\nAntes:\n", j, k);
-        imprimeMatriz(A, n, m);
-    }
+    if (j != k) {
+        if (verbose) {
+            printf("Trocando as colunas %d e %d...\nAntes:\n", j, k);
+            imprimeMatriz(A, n, m);
+        }
 
-    for (i = 0; i < n; i++) {
-        aux = A[i][j];
-        A[i][j] = A[i][k];
-        A[i][k] = aux;
-    }
+        for (i = 0; i < n; i++) {
+            aux = A[i][j];
+            A[i][j] = A[i][k];
+            A[i][k] = aux;
+        }
 
-    auxNorma = normas[j];
-    normas[j] = normas[k];
-    normas[k] = auxNorma;
+        auxNorma = normas[j];
+        normas[j] = normas[k];
+        normas[k] = auxNorma;
 
-    if (verbose) {
-        printf("Depois:\n");
-        imprimeMatriz(A, n, m);
+        if (verbose) {
+            printf("Depois:\n");
+            imprimeMatriz(A, n, m);
+        }
     }
 }
 
@@ -345,7 +360,7 @@ void multiplicaQt(int k, double gama) {
 
     /* ---- Qt * A ---- */ 
 
-    /* vT = gama * uT (Obs: vT existe em no intervalo [k, n[ */
+    /* vT = gama * uT Obs: vT existe em no intervalo [k, n[ */
     vT[k] = gama;
     temp[k] = 0;
     for (i = k + 1; i < n; i++){
@@ -393,13 +408,13 @@ void back_subst(double x[], int k) {
 
     int i, j;      
 
-    printf("x:\n");
+    
     for (i = k-1; i >= 0; i--) {
         for (j = k-1; j >= i; j--)
             x[i] += b[i] - A[i][j] * x[j];
-        printf("%lf \n", x[i]);
         x[i] = x[i] / A[i][i];  
     }
 
+    printf("x:\n");
     imprimeVetor(x, n);
 }
