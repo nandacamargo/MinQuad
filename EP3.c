@@ -38,7 +38,7 @@ void permutacao(int j, int k, double normas[]);
 
 double decomposicaoQR(int k, double normas[]);
 
-void multiplicaB(int k, double gama);
+void multiplicaQt(int k, double gama);
 
 void back_subst(double x[MAXN], int k);
 
@@ -95,15 +95,21 @@ int main(int argc, char* argv[]) {
         c = maiorNorma(normas, k);
         p[k] = c;
 
+        if (normas[c] <= EPS)
+            break;
+
         if (c != k)
             permutacao(c, k, normas);
 
         gama = decomposicaoQR(k, normas);
 
-        multiplicaB(k, gama);
+        multiplicaQt(k, gama);
 
         if (verbose) printf("--------------\n");
-     }
+    }
+
+    printf("Fim do QR. Posto(A) = %d\n", k);
+
 
     return 0;
 }
@@ -240,7 +246,7 @@ int maiorNorma(double normas[], int k) {
             max = normas[j];
         }
 
-    if (verbose)
+    if (verbose && c != -1)
         printf("Maior norma: %lf (normas[%d])\n", max, c);
 
     return c;
@@ -319,24 +325,76 @@ double decomposicaoQR(int k, double normas[]) {
     return gama;
 }
 /* Essa função multiplica o vetor b por um Qt = I - gama * uT * u */
-void multiplicaB(int k, double gama) {
+void multiplicaQt(int k, double gama) {
 
-    int i;
-    double v;
+    int i, j;
+    double c, xk;
+    double vT[MAXN], temp[MAXN];
 
-    /* gama * uT * b */
-    v = gama * b[k];
+    /* ---- Qt * b ---- */
+    /* c = gama * uT * b */
+    c = gama * b[k];
 
+    for (i = k + 1; i < n; i++) 
+        c += gama * A[i][k] * b[i]; /* A[i][k] é u[i] */
+
+    /* b = b - u * c */
+    b[k] -= c; 
     for (i = k + 1; i < n; i++)
-        v += gama * A[i][k] * b[i]; /* A[i][k] é u[i] */
+        b[i] -= A[i][k] * c;
 
-    b[k] -= v; 
-    for (i = k + 1; i < n; i++)
-        b[i] -= A[i][k] * v;
+    /* ---- Qt * A ---- */ 
+
+    /* vT = gama * uT (Obs: vT existe em no intervalo [k, n[ */
+    vT[k] = gama;
+    temp[k] = 0;
+    for (i = k + 1; i < n; i++){
+        vT[i] = gama * A[i][k];
+        temp[i] = 0;
+    }
+
+    printf("k = %d\n", k);
+    printf("vT: \n");
+    imprimeVetor(vT + k, n - k);
+
+    printf("A: \n");
+    imprimeMatriz(A, n, m);
+
+    /* temp = vT * A */
+
+    /* primeira linha de A (pois não precisamos mexer em A[k][k]) */
+
+    temp[k] = vT[k] * (1 - gama) * A[k][k];
+    for (j = k + 1; j < m; j++)
+        temp[j] += vT[k] * A[k][j];
+
+    /* Resto das linhas de A */
+
+    for (i = k + 1; i < n ; i++) 
+        for (j = i; j < m; j++)
+            temp[j] += vT[i] * A[i][j];
+
+    printf("temp: \n");
+    imprimeVetor(temp + k, n - k);   
+
+    /* A = A - u * temp */
+    /* Primeira linha de A (pois não precisamos mexer em A[k][k])) */
+    for (j = k + 1; j < m; j++)
+        A[k][j] -= temp[j];
+
+    /* Resto das linhas de A */
+
+    for (i = k + 1; i < n; i++) 
+        for (j = i; j < m; j++)
+            A[i][j] -= A[i][k] * temp[j];
+
 
     if (verbose) {
         printf("Q^t * b: \n");
         imprimeVetor(b, n);
+
+        printf("R: \n");
+        imprimeMatriz(A, n, m);
     }
 
 }
