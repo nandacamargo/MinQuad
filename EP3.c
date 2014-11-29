@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
     /* Permuta x */
     for (j = k - 1; j >= 0; j--)
         if (j != p[j]) {
-            printf("Trocando as colunas %d e %d de x...\n", j, p[j]);
+            if (verbose) printf("Trocando as colunas %d e %d de x...\n", j, p[j]);
             aux = x[j];
             x[j] = x[p[j]];
             x[p[j]] = aux;           
@@ -410,9 +410,11 @@ void back_subst(double x[], int k) {
 
     
     for (i = k-1; i >= 0; i--) {
-        for (j = k-1; j >= i; j--)
-            x[i] += b[i] - A[i][j] * x[j];
-        x[i] = x[i] / A[i][i];  
+        x[i] = b[i];
+        for (j = k-1; j > i; j--){
+            x[i] -= A[i][j] * x[j];
+        }
+        x[i] = x[i] / A[i][i]; 
     }
 
     printf("x:\n");
