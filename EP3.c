@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
     for (k = 0; k < m; k++) {
 
         if (verbose) printf("----- Q%d -----\n", k);
+
         recalculaNormas(normas, k);
         c = maiorNorma(normas, k);
         p[k] = c;
@@ -321,7 +322,7 @@ double decomposicaoQR(int k, double normas[]) {
     tau = sqrt(normas[j]);
     if (A[j][j] < 0) tau *= -1;
     A[j][j] += tau;
-    if (tau > EPS)
+    if (fabs(tau) > EPS)
         gama = A[j][j] / tau;
     else gama = 0;
 
@@ -379,7 +380,7 @@ void multiplicaQt(int k, double gama) {
     /* Resto das linhas de A */
 
     for (i = k + 1; i < n ; i++) 
-        for (j = i; j < m; j++)
+        for (j = k + 1; j < m; j++)
             temp[j] += vT[i] * A[i][j];  
 
     /* A = A - u * temp */
@@ -390,7 +391,7 @@ void multiplicaQt(int k, double gama) {
     /* Resto das linhas de A */
 
     for (i = k + 1; i < n; i++) 
-        for (j = i; j < m; j++)
+        for (j = k + 1; j < m; j++)
             A[i][j] -= A[i][k] * temp[j];
 
 
@@ -417,6 +418,8 @@ void back_subst(double x[], int k) {
         x[i] = x[i] / A[i][i]; 
     }
 
-    printf("x:\n");
-    imprimeVetor(x, n);
+    if (verbose) {
+        printf("x:\n");
+        imprimeVetor(x, n);
+    }   
 }
