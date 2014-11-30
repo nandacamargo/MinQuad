@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 #define EPS 0.0000000000000001
 #define MAXN 1000
@@ -50,6 +51,7 @@ int main(int argc, char* argv[]) {
     int p[MAXM];
 	double max, gama, aux;
 	double normas[MAXM], x[MAXM];
+    clock_t inicio, fim;
 
 	/* Lidando com os argumentos */
 
@@ -88,6 +90,8 @@ int main(int argc, char* argv[]) {
 
     /* Decomposição QR */
 
+    inicio = clock();
+
     for (k = 0; k < m; k++) {
 
         if (verbose) printf("----- Q%d -----\n", k);
@@ -110,6 +114,9 @@ int main(int argc, char* argv[]) {
 
     printf("Fim do QR. Posto(A) = %d\n", k);
 
+    fim = clock();
+    printf("%lf mili-segundos\n", ((double)(fim- inicio) / ((double)CLOCKS_PER_SEC))*1000);
+    
     /* Cálculo de x */
 
     back_subst(x, k);
@@ -275,7 +282,7 @@ void recalculaNormas(double normas[], int k) {
 		for (j = k; j < m; j++)
 			normas[j] -= A[k - 1][j] * A[k - 1][j];
 
-		if (k < m) {
+		if (verbose && k < m) {
 			printf("Vetor de normas recalculadas: \n");
 			imprimeVetor(normas, m);
 		}
