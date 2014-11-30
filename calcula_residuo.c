@@ -70,11 +70,6 @@ void leArquivo(char nomearq[]) {
 
     fclose(arq);
 
-    printf("A: \n");
-	imprimeMatriz(A, n, m);
-
-	printf("b: \n");
-	imprimeVetor(b, n);
 }
 
 void le_X(char nomearq[], double x_aprox[]) {
